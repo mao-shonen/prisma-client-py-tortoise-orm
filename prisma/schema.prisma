@@ -1,0 +1,39 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "node ./dist/index.mjs"
+  output   = "./generated"
+}
+
+/// model comment
+model User {
+  /// field comment
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  weight      Float?
+  is18        Boolean?
+  name        String?
+  wallet      Decimal
+  successorId Int?     @unique
+  successor   User?    @relation("BlogOwnerHistory", fields: [successorId], references: [id])
+  predecessor User?    @relation("BlogOwnerHistory")
+  role        Role     @default(USER)
+  posts       Post[]
+  biography   Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @db.DateTime(0)
+}
+
+model Post {
+  id     Int   @id @default(autoincrement())
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?
+}
+
+enum Role {
+  USER
+  ADMIN
+}

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2019", // node12
+    "module": "commonjs", // node12
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "baseUrl": "."
+  },
+  "exclude": ["node_modules", "dist"]
+}
