@@ -1,7 +1,8 @@
 {
   "name": "prisma-client-py-tortoise-orm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/index.cjs",
+  "bin": "dist/index.cjs",
   "license": "MIT",
   "description": "Generate python tortoise orm models by prisma generator",
   "author": {

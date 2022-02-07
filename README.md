@@ -20,7 +20,7 @@ yarn add -D prisma-client-py-tortoise-orm
 3. Add the generator to the schema
 
 ```prisma
-generator graphql {
+generator client {
   provider = "prisma-client-py-tortoise-orm"
   classNamePascalCase = true
   valueNameSnakeCase = true
