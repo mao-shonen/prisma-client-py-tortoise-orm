@@ -10,7 +10,7 @@ export const toPyValue = (value: PyType): string => {
     case 'boolean':
       return value ? 'True' : 'False'
     case 'string':
-      return `'${value.replace(`'`, `\\'`)}'`
+      return `'${value.replaceAll(`'`, `\\'`)}'`
     case 'undefined':
       return 'None'
     default:

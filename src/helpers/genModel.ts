@@ -370,10 +370,15 @@ export const genModel = (
               `not support prisma default option: ${field.default.name}`,
             )
           }
+        } else if (field.kind === 'enum') {
+          fieldDefault = `${field.type}.${field.default}`
+          pyField.value.args.push({
+            name: 'default',
+            value: fieldDefault,
+            valueIsObject: true,
+          })
         } else {
-          if (field.kind === 'enum') {
-            fieldDefault = `${field.type}.${field.default}`
-          } else if (field.type === FieldBaseType.BigInt) {
+          if (field.type === FieldBaseType.BigInt) {
             // fix bigint default "0"
             fieldDefault = parseFloat(field.default as string)
           } else {
@@ -382,7 +387,7 @@ export const genModel = (
 
           pyField.value.args.push({
             name: 'default',
-            value: fieldDefault,
+            value: toPyValue(fieldDefault),
             valueIsObject: true,
           })
         }

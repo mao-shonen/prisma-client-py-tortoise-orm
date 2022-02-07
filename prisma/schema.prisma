@@ -4,8 +4,10 @@ datasource db {
 }
 
 generator client {
-  provider = "node ./dist/index.mjs"
-  output   = "./generated"
+  provider            = "node ./dist/index.mjs"
+  output              = "./generated"
+  classNamePascalCase = true
+  valueNameSnakeCase  = true
 }
 
 /// model comment
@@ -31,6 +33,15 @@ model Post {
   id     Int   @id @default(autoincrement())
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?
+}
+
+// test option classNamePascalCase
+model group {
+  // test option valueNameSnakeCase
+  id     Int     @id
+  // test default string
+  name   String  @default("default")
+  public Boolean @default(true)
 }
 
 enum Role {
