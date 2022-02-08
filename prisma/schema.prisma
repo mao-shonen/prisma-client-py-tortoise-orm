@@ -25,8 +25,8 @@ model User {
   role        Role     @default(USER)
   posts       Post[]
   biography   Json
-  group       group    @relation(fields: [groupId], references: [id])
-  groupId     Int
+  group       group?   @relation(fields: [groupId], references: [id])
+  groupId     Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @db.DateTime(0)
 }
