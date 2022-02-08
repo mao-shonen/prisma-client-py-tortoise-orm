@@ -25,6 +25,8 @@ model User {
   role        Role     @default(USER)
   posts       Post[]
   biography   Json
+  group       group    @relation(fields: [groupId], references: [id])
+  groupId     Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @db.DateTime(0)
 }
@@ -42,6 +44,10 @@ model group {
   // test default string
   name   String  @default("default")
   public Boolean @default(true)
+
+  // test alias model name
+  User User[]
+  @@map("groups")
 }
 
 enum Role {

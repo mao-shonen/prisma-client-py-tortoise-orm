@@ -1,7 +1,7 @@
 import { DMMF } from '@prisma/generator-helper'
 import { logger } from '@prisma/sdk'
 import _ from 'lodash'
-import { PyClass, PyType, toPascalCase, toPyValue } from '../utils'
+import { getLastItem, PyClass, PyType, toPascalCase, toPyValue } from '../utils'
 import { config } from '../config'
 
 enum FieldBaseType {
@@ -88,7 +88,7 @@ export const genModel = (
 ): PyClass => {
   logger.info(`create model: ${model.name}`)
 
-  const pyClassName = getPyClassName(model.dbName ?? model.name)
+  const pyClassName = getPyClassName(model.name)
 
   const pyClass = new PyClass(pyClassName, ['Model'])
   let pyClassPKFieldName: string | undefined
@@ -436,14 +436,13 @@ export const genModel = (
   })
 
   // meta
-  const meta = new PyClass('Meta')
+  pyClass.subClasses.push(new PyClass('Meta'))
+  const meta = getLastItem(pyClass.subClasses)
 
   meta.fields.push({
     name: 'table',
-    value: model.name,
+    value: model.dbName ?? model.name,
   })
-
-  pyClass.subClasses.push(meta)
 
   // __str__
   pyClass.methods.push({
