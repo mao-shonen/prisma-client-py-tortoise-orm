@@ -1,8 +1,15 @@
+from tortoise import Tortoise
 from tortoise.contrib import test
+from tortoise.contrib.pydantic.creator import pydantic_model_creator
 from prisma.generated.models import *
 
 
 class TestCrud(test.TestCase):
+    async def test_pydantic_model_creator(self):
+        pydantic_model_creator(User, name=User.__name__)
+        pydantic_model_creator(Post, name=Post.__name__)
+        pydantic_model_creator(Group, name=Group.__name__)
+
     async def test_create_user(self, email: str = 'user@example.com'):
         return await User.create(email=email, wallet=100, biography=[])
 
@@ -22,6 +29,9 @@ class TestCrud(test.TestCase):
     async def test_enum(self):
         user = await self.test_create_user()
         await user.update_from_dict({'role': Role.USER})
+
+    async def test_relation(self):
+        Tortoise.init_models(['prisma.generated.models'], 'models')
 
     async def test_relation_o2o(self):
         user1 = await self.test_create_user(email='user1@example.com')

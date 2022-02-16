@@ -255,11 +255,12 @@ export const genModel = (
           ? relationFromField.dbNames[0]
           : relationFromField.name
         // tortoise orm 默認會使用 _id 的字段
-        if (relationFromFieldName !== `${pyField.name}}_id`)
+        if (relationFromFieldName !== `${pyField.name}_id`) {
           pyField.value.args.push({
             name: 'source_field',
             value: relationFromFieldName,
           })
+        }
 
         pyField.value.args.push({
           name: 'model_name',

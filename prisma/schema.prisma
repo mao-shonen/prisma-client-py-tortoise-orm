@@ -32,9 +32,9 @@ model User {
 }
 
 model Post {
-  id     Int   @id @default(autoincrement())
-  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId Int?
+  id      Int   @id @default(autoincrement())
+  user    User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user_id Int?
 }
 
 // test option classNamePascalCase
