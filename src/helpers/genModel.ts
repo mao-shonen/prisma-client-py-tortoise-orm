@@ -250,12 +250,16 @@ export const genModel = (
             `model relation field [${field.name}] not found source field [${field.relationFromFields[0]}]`,
           )
         }
-        pyField.value.args.push({
-          name: 'source_field',
-          value: relationFromField.dbNames
-            ? relationFromField.dbNames[0]
-            : relationFromField.name,
-        })
+
+        const relationFromFieldName = relationFromField.dbNames
+          ? relationFromField.dbNames[0]
+          : relationFromField.name
+        // tortoise orm 默認會使用 _id 的字段
+        if (relationFromFieldName !== `${pyField.name}}_id`)
+          pyField.value.args.push({
+            name: 'source_field',
+            value: relationFromFieldName,
+          })
 
         pyField.value.args.push({
           name: 'model_name',
