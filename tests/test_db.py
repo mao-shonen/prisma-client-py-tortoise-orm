@@ -54,4 +54,5 @@ class TestCrud(test.TestCase):
         assert group.ping() == 'pong'
 
     async def test_extent_meta(self):
-        assert getattr(User.Meta, 'exclude')
+        assert User.Meta.ordering == ['-id']
+        assert User.PydanticMeta.exclude == ['password']

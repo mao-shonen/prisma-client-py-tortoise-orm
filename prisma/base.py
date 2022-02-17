@@ -1,5 +1,8 @@
 class User:
     class Meta:
+        ordering = ['-id']
+
+    class PydanticMeta:
         exclude = ['password']
 
 

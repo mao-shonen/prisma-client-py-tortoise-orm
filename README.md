@@ -94,6 +94,9 @@ npx prisma generate
   # ./db/base.py
   class User:
       class Meta:
+          ordering = ['-id']
+
+      class PydanticMeta:
           exclude = ['password']
 
       def updatePassword(self, passwd: str):
@@ -110,6 +113,10 @@ npx prisma generate
 
       class Meta(base.User.Meta):
           table = 'users'
+
+  assert User.Meta.ordering
+  assert User.PydanticMeta.exclude
+  assert User.updatePassword
   ```
 
 ## Generate example
