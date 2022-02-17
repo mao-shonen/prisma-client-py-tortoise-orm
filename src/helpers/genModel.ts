@@ -1,7 +1,14 @@
 import { DMMF } from '@prisma/generator-helper'
 import { logger } from '@prisma/sdk'
 import _ from 'lodash'
-import { getLastItem, PyClass, PyType, toPascalCase, toPyValue } from '../utils'
+import {
+  getLastItem,
+  getPyIndent,
+  PyClass,
+  PyType,
+  toPascalCase,
+  toPyValue,
+} from '../utils'
 import { config } from '../config'
 
 enum FieldBaseType {
@@ -82,6 +89,40 @@ const getFieldEmoji = (field: DMMF.Field) => {
   }
 }
 
+import fs from 'fs'
+
+const isExistSourceClass = (className: string): boolean => {
+  if (!fs.existsSync(config.sourceClassFile)) return false
+
+  const classNames = className.split('.')
+  let index = 0
+  const data = fs.readFileSync(config.sourceClassFile)
+
+  const content = data.toString('utf8')
+  const lens = content.split('\n')
+
+  for (const len of lens) {
+    const targetClassName = `${getPyIndent(index)}class ${classNames[index]}`
+    if (
+      len.startsWith(targetClassName) &&
+      [':', '('].includes(len[targetClassName.length])
+    ) {
+      if (index + 1 === classNames.length) {
+        return true
+      } else {
+        index += 1
+        continue
+      }
+    }
+
+    if (index > 0 && !len.startsWith(getPyIndent(index))) {
+      return false
+    }
+  }
+
+  return false
+}
+
 export const genModel = (
   model: DMMF.Model,
   ctx: { models: DMMF.Model[] },
@@ -92,6 +133,10 @@ export const genModel = (
 
   const pyClass = new PyClass(pyClassName, ['Model'])
   let pyClassPKFieldName: string | undefined
+
+  if (isExistSourceClass(pyClassName)) {
+    pyClass.extends?.splice(0, 0, `base.${pyClassName}`)
+  }
 
   const pyClassDoc: string[] = model.documentation
     ? [`${model.documentation}\n`]
@@ -443,6 +488,10 @@ export const genModel = (
   // meta
   pyClass.subClasses.push(new PyClass('Meta'))
   const meta = getLastItem(pyClass.subClasses)
+
+  if (isExistSourceClass(`${pyClassName}.Meta`)) {
+    meta.extends?.splice(0, 0, `base.${pyClassName}.Meta`)
+  }
 
   meta.fields.push({
     name: 'table',

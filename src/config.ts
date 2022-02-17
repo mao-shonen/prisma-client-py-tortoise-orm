@@ -7,6 +7,7 @@ interface GeneratorConfig {
   classNamePascalCase: boolean
   valueNameSnakeCase: boolean
   createPyPackageInitFile: boolean
+  sourceClassFile: string
 }
 
 export const config: GeneratorConfig = {
@@ -15,10 +16,11 @@ export const config: GeneratorConfig = {
   classNamePascalCase: true,
   valueNameSnakeCase: true,
   createPyPackageInitFile: true,
+  sourceClassFile: './prisma/base.py',
 }
 
 export const updateConfig = (configOverlay: { [key: string]: any }): void => {
-  Object.assign(
+  return Object.assign(
     config,
     Object.entries(configOverlay).forEach(([key, value]) => {
       switch (typeof config[key as keyof GeneratorConfig]) {

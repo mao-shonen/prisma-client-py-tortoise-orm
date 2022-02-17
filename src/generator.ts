@@ -7,7 +7,7 @@ import { genModel } from './helpers/genModel'
 import { writeFileSafely, toPyValue } from './utils'
 import { name, version } from '../package.json'
 import { config, updateConfig } from './config'
-import { template } from './template'
+import { renderTemplate } from './template'
 
 generatorHandler({
   onManifest() {
@@ -21,7 +21,7 @@ generatorHandler({
   onGenerate: async (options: GeneratorOptions) => {
     updateConfig(options.generator.config)
 
-    const lens: string[] = [template]
+    const lens: string[] = [await renderTemplate()]
 
     const pyImportAll: string[] = []
 

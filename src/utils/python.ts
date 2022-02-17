@@ -1,3 +1,5 @@
+import path from 'path'
+
 export const getPyIndent = (level: number) => '    '.repeat(level)
 
 export type PyType = number | boolean | string | null | undefined
@@ -20,6 +22,14 @@ export const toPyValue = (value: PyType): string => {
         throw new TypeError(value)
       }
   }
+}
+
+export const toPyImport = (importPath: string): string => {
+  const workdir = path.resolve()
+  importPath = path.relative(workdir, importPath)
+  const importFrom = path.dirname(importPath).replaceAll(path.sep, '.')
+  const importModuleName = path.basename(importPath, '.py')
+  return `from ${importFrom} import ${importModuleName}`
 }
 
 export interface PyArg {
@@ -92,7 +102,7 @@ const genValue = (value: PyVarDeclare): string => {
 
 export class PyClass {
   name: string
-  extends?: string[]
+  extends: string[]
   doc?: string | string[]
   fields: PyVarDeclare[] = []
   methods: PyFuncDeclare[] = []
@@ -100,7 +110,7 @@ export class PyClass {
 
   constructor(name: string, _extends?: string[]) {
     this.name = name
-    this.extends = _extends
+    this.extends = _extends ?? []
   }
 
   generate(): string {
@@ -110,7 +120,7 @@ export class PyClass {
     content.push(
       [
         `class ${this.name}`,
-        this.extends ? `(${this.extends.join(',')})` : ``,
+        this.extends.length > 0 ? `(${this.extends.join(', ')})` : ``,
         ':',
       ].join(''),
     )

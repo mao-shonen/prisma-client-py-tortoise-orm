@@ -14,6 +14,7 @@ generator client {
 model User {
   /// field comment
   id          Int      @id @default(autoincrement())
+  password    String
   email       String   @unique
   weight      Float?
   is18        Boolean?
@@ -40,7 +41,7 @@ model Post {
 // test option classNamePascalCase
 model group {
   // test option valueNameSnakeCase
-  id     Int     @id
+  id     Int     @id @default(autoincrement())
   // test default string
   name   String  @default("default")
   public Boolean @default(true)
