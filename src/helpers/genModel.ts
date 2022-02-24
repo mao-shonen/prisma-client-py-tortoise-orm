@@ -258,6 +258,7 @@ export const genModel = (
         }
         const toField = toModel.fields.find(
           (_field) =>
+            _field.relationName === field.relationName &&
             _field.type === model.name &&
             _field.relationFromFields?.length === 0 &&
             _field.relationToFields?.length === 0,
@@ -344,6 +345,8 @@ export const genModel = (
             valueIsObject: true,
           })
         }
+
+        console.log(`test: ${model.name}.${field.name}`, field)
       }
 
       // base type
