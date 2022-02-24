@@ -320,7 +320,7 @@ export const genModel = (
         pyField.value.args.push({
           name: 'related_name',
           // value: field.relationName,
-          value: _.snakeCase(`${model.name}_${pyField.name}`),
+          value: _.snakeCase(`${toField.name}`),
         })
 
         enum relationOnDelete {
