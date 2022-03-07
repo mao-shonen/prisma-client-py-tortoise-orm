@@ -1,14 +1,21 @@
 # prisma-client-py-tortoise-orm
 
-this [prisma](https://github.com/prisma/prisma) client generator for Python [Tortoise ORM](https://github.com/tortoise/tortoise-orm)
+[![](https://img.shields.io/npm/v/prisma-client-py-tortoise-orm)](https://www.npmjs.com/package/prisma-client-py-tortoise-orm)
+[![](https://img.shields.io/github/license/mao-shonen/prisma-client-py-tortoise-orm)](LICENSE.txt)
+![](https://img.shields.io/node/v/prisma-client-py-tortoise-orm)
+![](https://img.shields.io/badge/python-%3E=3.7-blue)
+
+[prisma](https://github.com/prisma/prisma) client generator for python [tortoise ORM](https://github.com/tortoise/tortoise-orm)
+
+---
 
 ## Getting Started
 
-1. Setup prisma
+### 1. Setup prisma
 
 [Prisma Doc](https://www.prisma.io/docs/getting-started)
 
-2. Install
+### 2. Install
 
 ```bash
 // use npm
@@ -17,7 +24,7 @@ npm install --save-dev prisma-client-py-tortoise-orm
 yarn add -D prisma-client-py-tortoise-orm
 ```
 
-3. Add the generator to the schema
+### 3. Add the generator to the schema
 
 ```prisma
 generator graphql {
@@ -27,13 +34,15 @@ generator graphql {
 }
 ```
 
-4. Run generation
+### 4. Run generation
 
 ```bash
 npx prisma generate
 ```
 
-5. check generated
+### 5. check generated
+
+---
 
 ## Limitations
 
@@ -41,13 +50,18 @@ npx prisma generate
 
 - not support composite key
 
-## Not yet supported feature notes
+---
 
-1. [ ] unsupported type field
-2. [ ] uuid
-3. [ ] model default cuid()
-4. [ ] model create/update helper
-5. [ ] Implicit m2m relationship
+## Features to be added later
+
+- [ ] unsupported type field
+- [ ] uuid
+- [ ] model default cuid()
+- [ ] model create/update helper
+- [ ] Implicit m2m relationship
+- [ ] ...and more
+
+---
 
 ## Generator options
 
@@ -70,6 +84,7 @@ npx prisma generate
           }
       },
       ...other
+    }
     ```
 - `classNamePascalCase`
   - `type`: boolean
@@ -83,6 +98,8 @@ npx prisma generate
   - `type`: boolean
   - `default`: true
   - `desc`: Generate folder automatically create \_\_init\_\_.py if it does not exist
+
+---
 
 ## Generate example
 
