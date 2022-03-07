@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { toBoolean } from './utils'
 
 interface GeneratorConfig {
   modelsFile: string
@@ -6,6 +7,7 @@ interface GeneratorConfig {
   classNamePascalCase: boolean
   valueNameSnakeCase: boolean
   createPyPackageInitFile: boolean
+  sourceClassFile: string
 }
 
 export const config: GeneratorConfig = {
@@ -14,10 +16,11 @@ export const config: GeneratorConfig = {
   classNamePascalCase: true,
   valueNameSnakeCase: true,
   createPyPackageInitFile: true,
+  sourceClassFile: './prisma/base.py',
 }
 
 export const updateConfig = (configOverlay: { [key: string]: any }): void => {
-  Object.assign(
+  return Object.assign(
     config,
     Object.entries(configOverlay).forEach(([key, value]) => {
       switch (typeof config[key as keyof GeneratorConfig]) {
@@ -25,7 +28,7 @@ export const updateConfig = (configOverlay: { [key: string]: any }): void => {
           Object.assign(config, { [key]: value })
           break
         case 'boolean':
-          Object.assign(config, { [key]: _.isBoolean(value) })
+          Object.assign(config, { [key]: toBoolean(value) })
           break
         case 'number':
           Object.assign(config, { [key]: _.toNumber(value) })

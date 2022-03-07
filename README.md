@@ -27,7 +27,7 @@ yarn add -D prisma-client-py-tortoise-orm
 ### 3. Add the generator to the schema
 
 ```prisma
-generator graphql {
+generator client {
   provider = "prisma-client-py-tortoise-orm"
   classNamePascalCase = true
   valueNameSnakeCase = true
@@ -98,6 +98,41 @@ npx prisma generate
   - `type`: boolean
   - `default`: true
   - `desc`: Generate folder automatically create \_\_init\_\_.py if it does not exist
+- `sourceClassFile`
+
+  - `type`: string
+  - `default`: "./prisma/base.py"
+  - `desc`: The generated model will inherit the class of the same name as `base.py`.
+  - `example`:
+
+  ```py
+  # ./db/base.py
+  class User:
+      class Meta:
+          ordering = ['-id']
+
+      class PydanticMeta:
+          exclude = ['password']
+
+      def updatePassword(self, passwd: str):
+          self.password = hmac_sha256('secret_key', passwd)
+  ```
+
+  ```py
+  # ./prisma/generated/model.py
+  from db import base as base
+
+  class User(base.User):
+      id = field.IntField(pk=True)
+      name = field.CharField(pk=True)
+
+      class Meta(base.User.Meta):
+          table = 'users'
+
+  assert User.Meta.ordering
+  assert User.PydanticMeta.exclude
+  assert User.updatePassword
+  ```
 
 ---
 

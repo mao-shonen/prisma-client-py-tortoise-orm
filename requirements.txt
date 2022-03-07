@@ -1,3 +1,0 @@
-tortoise-orm ~= 0.18.1
-black ~= 21.12b0
-pytest ~= 6.2.5

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "prisma-client-py-tortoise-orm"
+version = "0.0.0"
+description = "Generate python tortoise orm models by prisma generator"
+authors = ["魔王少年 <q267009886.work@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+tortoise-orm = "^0.18.1"
+black = "^22.1.0"
+pytest = "latest"
+pydantic = "^1.9.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

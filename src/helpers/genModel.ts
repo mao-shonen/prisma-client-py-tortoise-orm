@@ -1,7 +1,14 @@
 import { DMMF } from '@prisma/generator-helper'
 import { logger } from '@prisma/sdk'
 import _ from 'lodash'
-import { PyClass, PyType, toPascalCase, toPyValue } from '../utils'
+import {
+  getLastItem,
+  getPyIndent,
+  PyClass,
+  PyType,
+  toPascalCase,
+  toPyValue,
+} from '../utils'
 import { config } from '../config'
 
 enum FieldBaseType {
@@ -82,16 +89,54 @@ const getFieldEmoji = (field: DMMF.Field) => {
   }
 }
 
+import fs from 'fs'
+
+const isExistSourceClass = (className: string): boolean => {
+  if (!fs.existsSync(config.sourceClassFile)) return false
+
+  const classNames = className.split('.')
+  let index = 0
+  const data = fs.readFileSync(config.sourceClassFile)
+
+  const content = data.toString('utf8')
+  const lens = content.split('\n')
+
+  for (const len of lens) {
+    const targetClassName = `${getPyIndent(index)}class ${classNames[index]}`
+    if (
+      len.startsWith(targetClassName) &&
+      [':', '('].includes(len[targetClassName.length])
+    ) {
+      if (index + 1 === classNames.length) {
+        return true
+      } else {
+        index += 1
+        continue
+      }
+    }
+
+    if (index > 0 && !len.startsWith(getPyIndent(index))) {
+      return false
+    }
+  }
+
+  return false
+}
+
 export const genModel = (
   model: DMMF.Model,
   ctx: { models: DMMF.Model[] },
 ): PyClass => {
   logger.info(`create model: ${model.name}`)
 
-  const pyClassName = getPyClassName(model.dbName ?? model.name)
+  const pyClassName = getPyClassName(model.name)
 
   const pyClass = new PyClass(pyClassName, ['Model'])
   let pyClassPKFieldName: string | undefined
+
+  if (isExistSourceClass(pyClassName)) {
+    pyClass.extends?.splice(0, 0, `base.${pyClassName}`)
+  }
 
   const pyClassDoc: string[] = model.documentation
     ? [`${model.documentation}\n`]
@@ -213,6 +258,7 @@ export const genModel = (
         }
         const toField = toModel.fields.find(
           (_field) =>
+            _field.relationName === field.relationName &&
             _field.type === model.name &&
             _field.relationFromFields?.length === 0 &&
             _field.relationToFields?.length === 0,
@@ -250,12 +296,17 @@ export const genModel = (
             `model relation field [${field.name}] not found source field [${field.relationFromFields[0]}]`,
           )
         }
-        pyField.value.args.push({
-          name: 'source_field',
-          value: relationFromField.dbNames
-            ? relationFromField.dbNames[0]
-            : relationFromField.name,
-        })
+
+        const relationFromFieldName = relationFromField.dbNames
+          ? relationFromField.dbNames[0]
+          : relationFromField.name
+        // tortoise orm 默認會使用 _id 的字段
+        if (relationFromFieldName !== `${pyField.name}_id`) {
+          pyField.value.args.push({
+            name: 'source_field',
+            value: relationFromFieldName,
+          })
+        }
 
         pyField.value.args.push({
           name: 'model_name',
@@ -270,7 +321,7 @@ export const genModel = (
         pyField.value.args.push({
           name: 'related_name',
           // value: field.relationName,
-          value: _.snakeCase(`${model.name}_${pyField.name}`),
+          value: _.snakeCase(`${toField.name}`),
         })
 
         enum relationOnDelete {
@@ -294,6 +345,8 @@ export const genModel = (
             valueIsObject: true,
           })
         }
+
+        console.log(`test: ${model.name}.${field.name}`, field)
       }
 
       // base type
@@ -370,10 +423,15 @@ export const genModel = (
               `not support prisma default option: ${field.default.name}`,
             )
           }
+        } else if (field.kind === 'enum') {
+          fieldDefault = `${field.type}.${field.default}`
+          pyField.value.args.push({
+            name: 'default',
+            value: fieldDefault,
+            valueIsObject: true,
+          })
         } else {
-          if (field.kind === 'enum') {
-            fieldDefault = `${field.type}.${field.default}`
-          } else if (field.type === FieldBaseType.BigInt) {
+          if (field.type === FieldBaseType.BigInt) {
             // fix bigint default "0"
             fieldDefault = parseFloat(field.default as string)
           } else {
@@ -382,7 +440,7 @@ export const genModel = (
 
           pyField.value.args.push({
             name: 'default',
-            value: fieldDefault,
+            value: toPyValue(fieldDefault),
             valueIsObject: true,
           })
         }
@@ -431,14 +489,17 @@ export const genModel = (
   })
 
   // meta
-  const meta = new PyClass('Meta')
+  pyClass.subClasses.push(new PyClass('Meta'))
+  const meta = getLastItem(pyClass.subClasses)
+
+  if (isExistSourceClass(`${pyClassName}.Meta`)) {
+    meta.extends?.splice(0, 0, `base.${pyClassName}.Meta`)
+  }
 
   meta.fields.push({
     name: 'table',
-    value: model.name,
+    value: model.dbName ?? model.name,
   })
-
-  pyClass.subClasses.push(meta)
 
   // __str__
   pyClass.methods.push({
